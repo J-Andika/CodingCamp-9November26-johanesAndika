@@ -1,0 +1,497 @@
+/* ==========================================================================
+   Expense & Budget Visualizer — single stylesheet (project constraint)
+   Material: paper ledger. Hairline rules instead of stacked cards.
+   ========================================================================== */
+
+/* 1. Tokens ---------------------------------------------------------------- */
+:root {
+  --paper: #f6f5f1;
+  --surface: #fffefb;
+  --ink: #12130f;
+  --ink-2: #5f6159;
+  --ink-3: #8e9086;
+  --rule: #dddcd2;
+  --rule-strong: #c4c3b7;
+  --accent: #1e5c47;
+  --accent-ink: #ffffff;
+  --danger: #b23b26;
+  --cat-food: #1e5c47;
+  --cat-transport: #4a6fa5;
+  --cat-fun: #b8832a;
+
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
+  --gap: 20px;
+
+  --sans: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+
+  color-scheme: light;
+}
+
+html[data-theme='dark'] {
+  --paper: #131513;
+  --surface: #191c19;
+  --ink: #ecebe4;
+  --ink-2: #9b9d94;
+  --ink-3: #6f7169;
+  --rule: #2a2d29;
+  --rule-strong: #3b3f3a;
+  --accent: #6fc19b;
+  --accent-ink: #0d2117;
+  --danger: #e8795f;
+  --cat-food: #6fc19b;
+  --cat-transport: #7f9dcb;
+  --cat-fun: #d9a94e;
+
+  color-scheme: dark;
+}
+
+/* 2. Base ------------------------------------------------------------------ */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, p, ul { margin: 0; }
+ul { list-style: none; padding: 0; }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 3. Masthead -------------------------------------------------------------- */
+.masthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1080px;
+  margin-inline: auto;
+  padding: 18px var(--gap);
+  border-bottom: 1px solid var(--rule);
+}
+
+.wordmark {
+  font-family: var(--serif);
+  font-size: 22px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.wordmark span {
+  color: var(--accent);
+  padding-inline: 3px;
+}
+
+/* 4. Layout ---------------------------------------------------------------- */
+main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 22px;
+  max-width: 1080px;
+  margin-inline: auto;
+  padding: 22px var(--gap) 72px;
+}
+
+.panel { min-width: 0; }
+
+.panel-title {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+
+.eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--ink-2);
+}
+
+.panel--summary,
+.panel--entry {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-lg);
+  padding: 22px;
+}
+
+.panel--summary { display: grid; gap: 20px; }
+
+/* 5. Summary --------------------------------------------------------------- */
+.total {
+  font-family: var(--serif);
+  font-size: clamp(42px, 12vw, 58px);
+  line-height: 0.95;
+  letter-spacing: -0.025em;
+  font-variant-numeric: tabular-nums;
+  margin-top: -4px;
+  transition: color 140ms ease;
+}
+
+.total.is-over { color: var(--danger); }
+
+.over-note {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--danger);
+  margin-top: -6px;
+}
+
+.limit { display: grid; gap: 8px; }
+
+.limit-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-md);
+  background: var(--paper);
+}
+
+.limit-field input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  color: inherit;
+}
+
+.limit-field input:focus-visible { outline: none; }
+.limit-field:focus-within { border-color: var(--accent); }
+
+/* 6. Chart ----------------------------------------------------------------- */
+.chart-frame {
+  position: relative;
+  min-width: 0;
+  min-height: 200px;
+  display: grid;
+  place-items: center;
+  padding-top: 4px;
+  border-top: 1px solid var(--rule);
+}
+
+/* Chart.js writes an inline width to the canvas; clamp it so the canvas can
+   never act as the panel's min-content and widen the grid column. */
+.chart-frame canvas {
+  width: 100% !important;
+  max-width: 100%;
+  max-height: 240px;
+}
+
+.chart-empty {
+  position: absolute;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+/* legend behaves as the chart's data table */
+.chart-legend {
+  display: grid;
+  gap: 9px;
+  padding-top: 4px;
+}
+
+.chart-legend:empty { display: none; }
+
+.legend-row {
+  display: grid;
+  grid-template-columns: 8px 4.5rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.legend-name { color: var(--ink-2); }
+
+.legend-bar {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--rule);
+  overflow: hidden;
+}
+
+.legend-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+}
+
+.legend-value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.chart-frame:not(.is-empty) .chart-empty { display: none; }
+.chart-frame.is-empty canvas { opacity: 0.25; }
+
+/* 7. Form ------------------------------------------------------------------ */
+.panel--entry { display: grid; gap: 16px; }
+
+form { display: grid; gap: 16px; }
+
+.field { display: grid; gap: 6px; min-width: 0; }
+
+.field-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.field label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ink-2);
+}
+
+input, select {
+  font: inherit;
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--r-md);
+  padding: 0 12px;
+  min-height: 44px;
+  width: 100%;
+}
+
+input::placeholder { color: var(--ink-3); opacity: 1; }
+
+input[aria-invalid='true'],
+select[aria-invalid='true'] { border-color: var(--danger); }
+
+.field-error {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--danger);
+}
+
+.btn-primary {
+  min-height: 48px;
+  padding: 0 20px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--accent-ink);
+  background: var(--accent);
+  border: 0;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: opacity 140ms ease;
+}
+
+.btn-primary:hover { opacity: 0.88; }
+
+.btn-ghost {
+  min-height: 40px;
+  padding: 0 14px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-2);
+  background: none;
+  border: 1px solid var(--rule-strong);
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-ghost:hover { color: var(--ink); border-color: var(--ink-3); }
+
+/* 8. Ledger ---------------------------------------------------------------- */
+.list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--rule-strong);
+}
+
+.list-tools {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-width: 0;
+}
+
+.count {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+}
+
+.list-tools select {
+  width: auto;
+  max-width: 100%;
+  min-height: 36px;
+  font-size: 13px;
+  padding-inline: 8px;
+  border-radius: var(--r-sm);
+}
+
+.tx-list { max-height: none; }
+
+.tx {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-areas:
+    'name   amount del'
+    'sub    amount del';
+  align-items: center;
+  gap: 0 12px;
+  padding: 10px 2px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.tx-name {
+  grid-area: name;
+  font-size: 15px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+/* category + date ride under the name, right after it in the same cell */
+.tx-sub {
+  grid-area: sub;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.tx-cat {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 600;
+}
+
+.tx-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+
+.tx-cat-food { color: var(--cat-food); }
+.tx-cat-transport { color: var(--cat-transport); }
+.tx-cat-fun { color: var(--cat-fun); }
+
+.tx-cat-bg-food { background: var(--cat-food); }
+.tx-cat-bg-transport { background: var(--cat-transport); }
+.tx-cat-bg-fun { background: var(--cat-fun); }
+
+.tx-amount {
+  grid-area: amount;
+  align-self: end;
+  justify-self: end;
+  padding-right: 2px;
+  font-size: 15px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.tx-del {
+  grid-area: del;
+  align-self: center;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-right: -12px;
+  font-size: 19px;
+  line-height: 1;
+  color: var(--ink-2);
+  background: none;
+  border: 0;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+}
+
+.tx-del:hover { color: var(--danger); background: color-mix(in srgb, var(--danger) 10%, transparent); }
+
+.empty {
+  padding: 28px 2px;
+  font-size: 14px;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule);
+}
+
+/* 9. Larger screens -------------------------------------------------------- */
+@media (min-width: 880px) {
+  main {
+    grid-template-columns: minmax(0, 1.4fr) minmax(300px, 1fr);
+    grid-template-rows: auto 1fr;
+    align-items: start;
+    gap: 26px 34px;
+    padding-top: 30px;
+  }
+
+  .panel--entry { grid-column: 1; grid-row: 1; }
+  .panel--list { grid-column: 1; grid-row: 2; }
+
+  .panel--summary {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    position: sticky;
+    top: 24px;
+  }
+
+  .tx-list { max-height: 420px; overflow-y: auto; }
+
+  .tx-list::-webkit-scrollbar { width: 8px; }
+  .tx-list::-webkit-scrollbar-thumb {
+    background: var(--rule-strong);
+    border-radius: 999px;
+  }
+}
+
+/* 10. Motion preferences --------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}

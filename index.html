@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Expense &amp; Budget Visualizer</title>
+<meta name="description" content="A small client-side expense tracker: log spending, watch the balance and the category split.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='3' fill='%231e5c47'/><circle cx='8' cy='8' r='3' fill='%23f6f5f1'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <p class="wordmark">Expense<span aria-hidden="true">/</span>Budget</p>
+  <button id="theme-toggle" class="btn-ghost" type="button" aria-pressed="false">Dark mode</button>
+</header>
+
+<main>
+
+  <!-- Total + limit + chart -->
+  <section class="panel panel--summary" aria-labelledby="summary-heading">
+    <h2 id="summary-heading" class="eyebrow">Total spent</h2>
+    <p id="total-balance" class="total" aria-live="polite">Rp 0</p>
+    <p id="over-note" class="over-note" hidden></p>
+
+    <div class="limit">
+      <label for="limit-input" class="eyebrow">Spending limit</label>
+      <div class="limit-field">
+        <input id="limit-input" type="text" inputmode="numeric" autocomplete="off"
+               placeholder="Not set" aria-label="Spending limit in rupiah">
+      </div>
+    </div>
+
+    <div class="chart-frame">
+      <canvas id="pie-chart" role="img" aria-label="Spending distribution by category"></canvas>
+      <p id="chart-empty" class="chart-empty">Nothing to chart yet.</p>
+    </div>
+
+    <ul id="chart-legend" class="chart-legend" aria-label="Spending by category"></ul>
+  </section>
+
+  <!-- Entry form -->
+  <section class="panel panel--entry" aria-labelledby="entry-heading">
+    <h2 id="entry-heading" class="panel-title">New entry</h2>
+    <form id="tx-form" novalidate>
+      <div class="field">
+        <label for="item-name">Item</label>
+        <input id="item-name" name="name" type="text" autocomplete="off" maxlength="60"
+               placeholder="Coffee, bus fare, cinema">
+        <span class="field-error" id="err-name" hidden></span>
+      </div>
+
+      <div class="field-pair">
+        <div class="field">
+          <label for="amount">Amount</label>
+          <input id="amount" name="amount" type="number" min="1" step="any" inputmode="decimal"
+                 placeholder="25000">
+          <span class="field-error" id="err-amount" hidden></span>
+        </div>
+        <div class="field">
+          <label for="category">Category</label>
+          <select id="category" name="category">
+            <option value="">Select</option>
+            <option value="Food">Food</option>
+            <option value="Transport">Transport</option>
+            <option value="Fun">Fun</option>
+          </select>
+          <span class="field-error" id="err-category" hidden></span>
+        </div>
+      </div>
+
+      <button class="btn-primary" type="submit">Add transaction</button>
+    </form>
+  </section>
+
+  <!-- Ledger -->
+  <section class="panel panel--list" aria-labelledby="list-heading">
+    <div class="list-head">
+      <h2 id="list-heading" class="panel-title">Transactions</h2>
+      <div class="list-tools">
+        <span id="tx-count" class="count">0 entries</span>
+        <label for="sort-select" class="visually-hidden">Sort transactions</label>
+        <select id="sort-select">
+          <option value="date">Newest first</option>
+          <option value="amount">Amount, high to low</option>
+          <option value="category">Category, A–Z</option>
+        </select>
+      </div>
+    </div>
+
+    <ul id="tx-list" class="tx-list"></ul>
+    <p id="tx-empty" class="empty">No transactions yet. Add your first one above.</p>
+  </section>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
