@@ -2,7 +2,7 @@
 
 **Expense & Budget Visualizer** — a client-side expense tracker built with HTML, CSS and vanilla JavaScript. No frameworks, no backend, no build step. Everything is stored in the browser's localStorage.
 
-Live site: `https://<your-username>.github.io/CodingCamp-9November26-johanesAndika/`
+Live site: **https://j-andika.github.io/CodingCamp-9November26-johanesAndika/**
 
 ## Features
 
